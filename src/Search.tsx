@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
+import * as XLSX from 'xlsx';
 import retelaClients from './retela.json';
+
+const { read, utils } = XLSX;
 
 interface ClientData {
   ic: string;
@@ -21,6 +24,16 @@ export const Search = () => {
     }
   };
 
+  const handleExport = () => {
+    console.log(companyData);
+    let wb = XLSX.utils.book_new();
+    let ws = XLSX.utils.json_to_sheet(companyData);
+
+    XLSX.utils.book_append_sheet(wb, ws, 'sheet1');
+
+    XLSX.writeFile(wb, 'export.xlsx');
+  };
+
   useEffect(() => {
     const fetchAllCompaniesData = async () => {
       const updatedCompanies = await Promise.all(
@@ -37,6 +50,7 @@ export const Search = () => {
 
   return (
     <div className="App">
+      <button onClick={handleExport}>Export</button>
       <table>
         <thead>
           <tr>
