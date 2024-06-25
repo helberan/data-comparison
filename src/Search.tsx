@@ -2,8 +2,6 @@ import { useEffect, useState } from 'react';
 import * as XLSX from 'xlsx';
 import retelaClients from './retela.json';
 
-const { read, utils } = XLSX;
-
 interface ClientData {
   ic: string;
   name: string;
@@ -11,6 +9,7 @@ interface ClientData {
 }
 
 export const Search = () => {
+  const [importedData, setImportedData] = useState<ClientData[]>();
   const [companyData, setCompanyData] = useState<ClientData[]>(retelaClients);
 
   const fetchCompanyData = async (ic: string): Promise<string> => {
@@ -21,6 +20,24 @@ export const Search = () => {
     } catch (err) {
       console.error(err);
       return '';
+    }
+  };
+
+  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onload = (event: ProgressEvent<FileReader>) => {
+        const workbook = XLSX.read(event.target?.result as string, { type: 'binary' });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const sheetData: ClientData[] = XLSX.utils.sheet_to_json(sheet);
+
+        setImportedData(sheetData);
+      };
+
+      reader.readAsBinaryString(file);
     }
   };
 
@@ -42,6 +59,7 @@ export const Search = () => {
           return { ...company, fetchedName: fetchedCompanyName };
         })
       );
+      setImportedData(updatedCompanies);
       setCompanyData(updatedCompanies);
     };
     fetchAllCompaniesData();
@@ -50,27 +68,37 @@ export const Search = () => {
 
   return (
     <div className="App">
-      <button onClick={handleExport}>Export</button>
-      <table>
-        <thead>
-          <tr>
-            <th>IČ</th>
-            <th>Název společnosti (DTB ECOBAT)</th>
-            <th>Název společnosti (ARES)</th>
-            <th>Porovnání názvů</th>
-          </tr>
-        </thead>
-        <tbody>
-          {companyData.map((company) => (
-            <tr key={company.ic}>
-              <td>{company.ic}</td>
-              <td>{company.name}</td>
-              <td>{company.fetchedName ? company.fetchedName : 'NENALEZENO'}</td>
-              <td>{company.fetchedName === company.name ? 'SHODA' : 'CHYBA'}</td>
+      <header>
+        <div className="import-wrapper">
+          <input type="file" onChange={handleImport} />
+          <button onClick={handleFetch}>Compare</button>
+        </div>
+        <button onClick={handleExport}>Export</button>
+      </header>
+      <div className="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>IČ</th>
+              <th>Název společnosti (DTB ECOBAT)</th>
+              <th>Název společnosti (ARES)</th>
+              <th>Porovnání názvů</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          {importedData && (
+            <tbody>
+              {importedData.map((company) => (
+                <tr key={company.ic}>
+                  <td>{company.ic}</td>
+                  <td>{company.name}</td>
+                  <td>{company.fetchedName ? company.fetchedName : 'NENALEZENO'}</td>
+                  <td>{company.fetchedName === company.name ? 'SHODA' : 'CHYBA'}</td>
+                </tr>
+              ))}
+            </tbody>
+          )}
+        </table>
+      </div>
     </div>
   );
 };

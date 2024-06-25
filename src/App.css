@@ -1,0 +1,47 @@
+body {
+  font-family: 'Calibri';
+}
+
+.table-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+table {
+  border: 1px solid black;
+  border-collapse: collapse;
+  margin: 2rem;
+  width: 80%;
+}
+
+th,
+td {
+  border: 1px solid black;
+  padding: 0.5rem;
+  text-align: center;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  margin: 2rem;
+}
+
+header button {
+  background-color: rgb(73, 73, 255);
+  color: white;
+  padding: 0.5rem;
+  width: 5rem;
+  height: 2rem;
+  border: none;
+  border-radius: 1rem;
+}
+
+header button:hover {
+  background-color: rgb(108, 108, 255);
+}
+
+.import-wrapper {
+  display: flex;
+  flex-direction: column;
+}
