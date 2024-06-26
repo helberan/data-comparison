@@ -45,11 +45,13 @@ export const Search = () => {
             setImportedData(sheetData);
             setSuccessMessage(true);
           } else {
+            setSuccessMessage(false);
             setRowNumberErrorMessage(true);
             setColumnNamesErrorMessage(false);
             setError(true);
           }
         } else {
+          setSuccessMessage(false);
           setColumnNamesErrorMessage(true);
           setRowNumberErrorMessage(false);
           setError(true);
@@ -99,7 +101,6 @@ export const Search = () => {
   useEffect(() => {
     setRowNumberErrorMessage(false);
     setColumnNamesErrorMessage(false);
-    setSuccessMessage(false);
     setError(false);
   }, [importedData]);
 
