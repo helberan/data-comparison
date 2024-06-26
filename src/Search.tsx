@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
+import { ErrorMessage } from './ErrorMessage';
+import { SuccessMessage } from './SuccessMessage';
 
 interface ClientData {
   IČ: string;
@@ -11,6 +13,8 @@ interface ClientData {
 export const Search = () => {
   const [importedData, setImportedData] = useState<ClientData[]>();
   const [companyData, setCompanyData] = useState<ClientData[]>();
+  const [errorMessage, setErrorMessage] = useState(false);
+  const [successMessage, setSuccessMessage] = useState(false);
 
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -23,11 +27,20 @@ export const Search = () => {
         const sheet = workbook.Sheets[sheetName];
         const sheetData: ClientData[] = XLSX.utils.sheet_to_json(sheet);
 
-        setImportedData(sheetData);
+        const numberOfRows = sheet['!ref'] ? XLSX.utils.decode_range(sheet['!ref']).e.r + 1 : 0;
+        console.log(`Number of rows: ${numberOfRows}`);
+
+        if (numberOfRows < 500) {
+          setImportedData(sheetData);
+          setSuccessMessage(true);
+        } else {
+          setErrorMessage(true);
+        }
       };
 
       reader.readAsBinaryString(file);
     }
+    console.log(successMessage);
   };
 
   const handleFetch = async () => {
@@ -65,12 +78,21 @@ export const Search = () => {
     }
   };
 
+  useEffect(() => {
+    setErrorMessage(false);
+    setSuccessMessage(false);
+  }, [importedData]);
+
   return (
     <div className="App">
       <header>
         <div className="import-wrapper">
           <input type="file" onChange={handleImport} />
-          <button onClick={handleFetch}>Porovnat</button>
+          {errorMessage && <ErrorMessage />}
+          {successMessage && <SuccessMessage />}
+          <button onClick={handleFetch} disabled={errorMessage ? true : false}>
+            Porovnat
+          </button>
         </div>
         <button onClick={handleExport}>Export</button>
       </header>

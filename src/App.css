@@ -23,7 +23,7 @@ th,
 td {
   border: 1px solid black;
   padding: 0.5rem;
-  text-align: center;
+  text-align: left;
 }
 
 .green {
@@ -54,6 +54,15 @@ header button {
 
 header button:hover {
   background-color: rgb(108, 108, 255);
+}
+
+header button:disabled {
+  background-color: rgb(171, 171, 177);
+  font-style: italic;
+}
+
+header button:disabled:hover {
+  background-color: rgb(171, 171, 177);
 }
 
 /*.import-wrapper {
@@ -98,4 +107,31 @@ header button:hover {
 
 .import-wrapper button:hover {
   background-color: rgb(108, 108, 255);
+}
+
+.error {
+  background-color: rgb(255, 202, 202);
+  height: 4rem;
+  border-radius: 1rem;
+  padding: 0.5rem;
+  display: flex;
+}
+
+.success {
+  background-color: rgb(220, 255, 207);
+  height: 4rem;
+  border-radius: 1rem;
+  padding: 0.5rem;
+  display: flex;
+}
+
+.error img,
+.success img {
+  width: 4rem;
+  height: auto;
+}
+
+.error p,
+.success p {
+  margin: 0.5rem;
 }
