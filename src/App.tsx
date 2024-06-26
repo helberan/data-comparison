@@ -1,9 +1,13 @@
 import './App.css';
-import { Form } from './Form';
+//import { Form } from './Form';
 import { Search } from './Search';
 
 function App() {
-  return <Search />;
+  return (
+    <div>
+      <Search />
+    </div>
+  );
 }
 
 export default App;

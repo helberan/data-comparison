@@ -76,6 +76,21 @@ header button:disabled:hover {
   gap: 10px;
 }
 
+.import-wrapper img {
+  width: 3rem;
+  height: auto;
+}
+
+.import-wrapper img:hover {
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.import-wrapper-inner {
+  display: flex;
+  align-items: center;
+}
+
 .import-wrapper input {
   height: 2rem;
   border-radius: 1rem;
@@ -107,6 +122,10 @@ header button:disabled:hover {
 
 .import-wrapper button:hover {
   background-color: rgb(108, 108, 255);
+}
+
+#compare {
+  margin-left: 3.1rem;
 }
 
 .error {

@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import { ErrorMessage } from './ErrorMessage';
 import { SuccessMessage } from './SuccessMessage';
+import { InfoModal } from './InfoModal';
+import info from './assets/info.png';
 
 interface ClientData {
   IČ: string;
@@ -87,10 +89,13 @@ export const Search = () => {
     <div className="App">
       <header>
         <div className="import-wrapper">
-          <input type="file" onChange={handleImport} />
+          <div className="import-wrapper-inner">
+            <InfoModal />
+            <input type="file" onChange={handleImport} />
+          </div>
           {errorMessage && <ErrorMessage />}
           {successMessage && <SuccessMessage />}
-          <button onClick={handleFetch} disabled={errorMessage ? true : false}>
+          <button id="compare" onClick={handleFetch} disabled={errorMessage ? true : false}>
             Porovnat
           </button>
         </div>
