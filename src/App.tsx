@@ -1,11 +1,12 @@
 import './App.css';
-//import { Form } from './Form';
 import { Search } from './Search';
+import { Footer } from './Footer';
 
 function App() {
   return (
     <div>
       <Search />
+      <Footer />
     </div>
   );
 }

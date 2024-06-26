@@ -156,3 +156,15 @@ header button:disabled:hover {
 .success p {
   margin: 0.5rem;
 }
+
+.Footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 5rem;
+}
+
+.Footer img {
+  width: 4rem;
+  height: auto;
+  margin-right: 2rem;
+}
