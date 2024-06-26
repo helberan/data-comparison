@@ -81,7 +81,7 @@ header button:disabled:hover {
   height: auto;
 }
 
-.import-wrapper img:hover {
+.import-wrapper-inner img:hover {
   cursor: pointer;
   opacity: 0.7;
 }
@@ -134,6 +134,7 @@ header button:disabled:hover {
   border-radius: 1rem;
   padding: 0.5rem;
   display: flex;
+  margin-left: 3rem;
 }
 
 .success {
@@ -142,6 +143,7 @@ header button:disabled:hover {
   border-radius: 1rem;
   padding: 0.5rem;
   display: flex;
+  margin-left: 3rem;
 }
 
 .error img,

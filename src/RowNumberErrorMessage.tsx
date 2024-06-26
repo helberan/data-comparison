@@ -1,6 +1,6 @@
 import error from './assets/error.png';
 
-export const ErrorMessage = () => {
+export const RowNumberErrorMessage = () => {
   return (
     <div className="error">
       <img src={error} alt="error" />

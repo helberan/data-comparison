@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
-import { ErrorMessage } from './ErrorMessage';
+import { RowNumberErrorMessage } from './RowNumberErrorMessage';
+import { ColumnNamesErrorMessage } from './ColumnNamesErrorMessage';
 import { SuccessMessage } from './SuccessMessage';
 import { InfoModal } from './InfoModal';
-import info from './assets/info.png';
 
 interface ClientData {
   IČ: string;
@@ -15,8 +15,10 @@ interface ClientData {
 export const Search = () => {
   const [importedData, setImportedData] = useState<ClientData[]>();
   const [companyData, setCompanyData] = useState<ClientData[]>();
-  const [errorMessage, setErrorMessage] = useState(false);
+  const [rowNumberErrorMessage, setRowNumberErrorMessage] = useState(false);
+  const [columnNamesErrorMessage, setColumnNamesErrorMessage] = useState(false);
   const [successMessage, setSuccessMessage] = useState(false);
+  const [error, setError] = useState(false);
 
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -29,14 +31,28 @@ export const Search = () => {
         const sheet = workbook.Sheets[sheetName];
         const sheetData: ClientData[] = XLSX.utils.sheet_to_json(sheet);
 
-        const numberOfRows = sheet['!ref'] ? XLSX.utils.decode_range(sheet['!ref']).e.r + 1 : 0;
-        console.log(`Number of rows: ${numberOfRows}`);
+        const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as any[][];
+        const headerRow = jsonData[0] as string[];
+        /* console.log('Column names:', headerRow);
+        console.log('1: ', headerRow[0]);
+        console.log('2: ', headerRow[1]); */
 
-        if (numberOfRows < 500) {
-          setImportedData(sheetData);
-          setSuccessMessage(true);
+        const numberOfRows = sheet['!ref'] ? XLSX.utils.decode_range(sheet['!ref']).e.r + 1 : 0;
+        //console.log(`Number of rows: ${numberOfRows}`);
+
+        if (headerRow[0] === 'IČ' && headerRow[1] === 'Subjekt') {
+          if (numberOfRows < 500) {
+            setImportedData(sheetData);
+            setSuccessMessage(true);
+          } else {
+            setRowNumberErrorMessage(true);
+            setColumnNamesErrorMessage(false);
+            setError(true);
+          }
         } else {
-          setErrorMessage(true);
+          setColumnNamesErrorMessage(true);
+          setRowNumberErrorMessage(false);
+          setError(true);
         }
       };
 
@@ -81,8 +97,10 @@ export const Search = () => {
   };
 
   useEffect(() => {
-    setErrorMessage(false);
+    setRowNumberErrorMessage(false);
+    setColumnNamesErrorMessage(false);
     setSuccessMessage(false);
+    setError(false);
   }, [importedData]);
 
   return (
@@ -93,13 +111,16 @@ export const Search = () => {
             <InfoModal />
             <input type="file" onChange={handleImport} />
           </div>
-          {errorMessage && <ErrorMessage />}
+          {rowNumberErrorMessage && <RowNumberErrorMessage />}
+          {columnNamesErrorMessage && <ColumnNamesErrorMessage />}
           {successMessage && <SuccessMessage />}
-          <button id="compare" onClick={handleFetch} disabled={errorMessage ? true : false}>
+          <button type="button" id="compare" onClick={handleFetch} disabled={error ? true : false}>
             Porovnat
           </button>
         </div>
-        <button onClick={handleExport}>Export</button>
+        <button type="button" onClick={handleExport}>
+          Export
+        </button>
       </header>
       <div className="table-wrapper">
         <table>
