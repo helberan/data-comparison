@@ -1,27 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import * as XLSX from 'xlsx';
-import retelaClients from './retela.json';
 
 interface ClientData {
-  ic: string;
-  name: string;
-  fetchedName?: string;
+  IČ: string;
+  Subjekt: string;
+  nazevAres?: string;
+  shoda?: boolean;
 }
 
 export const Search = () => {
   const [importedData, setImportedData] = useState<ClientData[]>();
-  const [companyData, setCompanyData] = useState<ClientData[]>(retelaClients);
-
-  const fetchCompanyData = async (ic: string): Promise<string> => {
-    try {
-      const response = await fetch(`https://ares.gov.cz/ekonomicke-subjekty-v-be/rest/ekonomicke-subjekty/${ic}`);
-      const data = await response.json();
-      return data.obchodniJmeno;
-    } catch (err) {
-      console.error(err);
-      return '';
-    }
-  };
+  const [companyData, setCompanyData] = useState<ClientData[]>();
 
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -41,37 +30,47 @@ export const Search = () => {
     }
   };
 
-  const handleExport = () => {
-    console.log(companyData);
-    let wb = XLSX.utils.book_new();
-    let ws = XLSX.utils.json_to_sheet(companyData);
-
-    XLSX.utils.book_append_sheet(wb, ws, 'sheet1');
-
-    XLSX.writeFile(wb, 'export.xlsx');
-  };
-
-  useEffect(() => {
-    const fetchAllCompaniesData = async () => {
+  const handleFetch = async () => {
+    if (importedData) {
       const updatedCompanies = await Promise.all(
-        companyData.map(async (company) => {
-          const fetchedCompanyName = await fetchCompanyData(company.ic);
-          return { ...company, fetchedName: fetchedCompanyName };
+        importedData.map(async (company) => {
+          const fetchedCompanyName = await fetchCompanyData(company.IČ);
+          return { ...company, nazevAres: fetchedCompanyName, shoda: fetchedCompanyName === company.Subjekt };
         })
       );
-      setImportedData(updatedCompanies);
       setCompanyData(updatedCompanies);
-    };
-    fetchAllCompaniesData();
+    }
+  };
+
+  const fetchCompanyData = async (ic: string): Promise<string> => {
+    try {
+      const response = await fetch(`https://ares.gov.cz/ekonomicke-subjekty-v-be/rest/ekonomicke-subjekty/${ic}`);
+      const data = await response.json();
+      return data.obchodniJmeno;
+    } catch (err) {
+      console.error(err);
+      return '';
+    }
+  };
+
+  const handleExport = () => {
     console.log(companyData);
-  }, [retelaClients]);
+    if (companyData) {
+      let wb = XLSX.utils.book_new();
+      let ws = XLSX.utils.json_to_sheet(companyData);
+
+      XLSX.utils.book_append_sheet(wb, ws, 'sheet1');
+
+      XLSX.writeFile(wb, 'export.xlsx');
+    }
+  };
 
   return (
     <div className="App">
       <header>
         <div className="import-wrapper">
           <input type="file" onChange={handleImport} />
-          <button onClick={handleFetch}>Compare</button>
+          <button onClick={handleFetch}>Porovnat</button>
         </div>
         <button onClick={handleExport}>Export</button>
       </header>
@@ -85,16 +84,18 @@ export const Search = () => {
               <th>Porovnání názvů</th>
             </tr>
           </thead>
-          {importedData && (
+          {companyData && (
             <tbody>
-              {importedData.map((company) => (
-                <tr key={company.ic}>
-                  <td>{company.ic}</td>
-                  <td>{company.name}</td>
-                  <td>{company.fetchedName ? company.fetchedName : 'NENALEZENO'}</td>
-                  <td>{company.fetchedName === company.name ? 'SHODA' : 'CHYBA'}</td>
-                </tr>
-              ))}
+              {companyData.map((company) => {
+                return (
+                  <tr key={company.IČ}>
+                    <td>{company.IČ}</td>
+                    <td>{company.Subjekt}</td>
+                    <td>{company.nazevAres ? company.nazevAres : 'NENALEZENO'}</td>
+                    <td className={company.shoda ? 'green' : 'red'}>{company.shoda ? 'SHODA' : 'CHYBA'}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           )}
         </table>
