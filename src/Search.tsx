@@ -128,7 +128,7 @@ export const Search = () => {
           <thead>
             <tr>
               <th>IČ</th>
-              <th>Název společnosti (DTB ECOBAT)</th>
+              <th>Název společnosti (ze souboru)</th>
               <th>Název společnosti (ARES)</th>
               <th>Porovnání názvů</th>
             </tr>
